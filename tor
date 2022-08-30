@@ -1,0 +1,179 @@
+# tor(1) completion                                        -*- shell-script -*-
+
+_comp_xfunc_tor_torrcopt()
+{
+    _tor_torrc_opt="$(tor --list-torrc-options | sed "s|^|--|")"
+    COMPREPLY=($(compgen -W "${_tor_torrc_opt}" -- "$cur"))
+}
+
+_tor()
+{
+    local cur prev words cword
+    _init_completion -s || return
+
+    case $prev in
+        ## tor cli
+        --allow-missing-torrc | --ignore-missing-torrc | --verify-config | \
+            --list-torrc-options | --list-deprecated-options | \
+            --list-modules | --help | --version | --quiet | --hush )
+            return
+            ;;
+        --hash-password )
+            ## requires argument but not possible to complete
+            return
+            ;;
+        --defaults-torrc | --torrc-file )
+            _filedir
+            return
+            ;;
+        --dump-config )
+            COMPREPLY=($(compgen -W "short full" -- "$cur"))
+            return
+            ;;
+        --list-fingerprint )
+            COMPREPLY=($(compgen -W "rsa ed25519" -- "$cur"))
+            return
+            ;;
+        --keygen )
+            COMPREPLY=($(compgen -W "--newpass" -- "$cur"))
+            return
+            ;;
+        --key-expiration )
+            COMPREPLY=($(compgen -W "sign" -- "$cur"))
+            return
+            ;;
+        --format )
+            ## depends on --key-expiration
+            COMPREPLY=($(compgen -W "iso8601 timestamp" -- "$cur"))
+            return
+            ;;
+        --passphrase-fd )
+            COMPREPLY=($(compgen -W "$(ls /proc/$$/fd)" -- "$cur"))
+            return
+            ;;
+
+
+        ## torrc options
+        --AccelDir | --CacheDirectory | --DataDirectory | \
+            --ClientOnionAuthDir | --KeyDirectory | --HiddenServiceDir )
+            _filedir -d
+            return
+            ;;
+        --ControlPortWriteToFile | --ControlSocket | --CookieAuthFile | \
+            --ExtORPortCookieAuthFile | --PidFile | --GeoIPFile | \
+            --GeoIPv6File | --ServerDNSResolvConfFile | \
+            --DirPortFrontPage | --GuardfractionFile | --V3BandwidthsFile )
+            _filedir
+            return
+            ;;
+        --AvoidDiskWrites | --ConstrainedSockets | \
+            --ControlPortFileGroupReadable | --ControlSocketGroupWritable | \
+            --CookieAuthentication | --CookieAuhtfileGroupReadable | \
+            --CountPrivateBandwidth | --DataDirectoryGroupReadable | \
+            --DisableAllSwap | --DisableDebuggerAttachement | --DisableNetwork | \
+            --ExtORPortCookieAuthFileGroupReadable | --FetchDirInfoEarly | \
+            --FetchDirInfoExtraEarly | --FetchHidServDescriptors | \
+            --FetchServerDescriptors | --FetchUselessDescriptors | \
+            --HardwareAccel | --LogMessageDomains | --NoExec | \
+            --ProtocolWarnings | --RunAsDaemon | --SandBox | \
+            --TrunateLogFile| --UnixSocksGroupWritable | \
+            --UseDefaultFallbackDirs | --AllowNonRFC953Hostnames | \
+            --AutomapHostsOnResolve | --CircuitPadding | \
+            --ReducedCircuitPadding | --ClientDNSRejectInternalAddresses | \
+            --ClientOnly | --ClientRejectInternalAddresses | \
+            --ClientUseIPv4 | --ClientUseIPv6 | --ReducedConnectionPadding | \
+            --DownloadExtraInfo | --EnforceDistinctSubnets | \
+            --FascistFirewall | --SafeSocks | --TestSocks | \
+            --UpdateBridgesFromAuthority | --UseBridges | --UseEntryGuards | \
+            --LearnCircuitBuildTimeout | --DormantCanceledByStartup | \
+            --DormantOnFirstStartup | --DormantTimeoutDisabledByIdleStreams | \
+            --DormantTimeoutEnabled | --StrictNodes | --AddressDisableIPv6 | \
+            --AssumeReachable | --BridgeRelay | --DisableOOSCheck | \
+            --ExitPolicyRejectLocalInterfaces | --ExitPolicyRejectPrivate | \
+            --ExtendAllowPrivateAddresses | --IPv6Exit | --MainloopStats | \
+            --OfflineMasterKey | --ReducedExitPolicy | \
+            --ServerDNSAllowBrokenConfig | \
+            --ServerDNSAllowNonRFC953Hostnames | --ServerDNSDetectHijacking | \
+            --ServerDNSRandomizeCase | --ServerDNSSearchDomains | \
+            --BridgeRecordUsageByCountry | --CellStatistics | \
+            --ConnDirectionStatistics | --DirReqStatistics | \
+            --EntryStatistics | --ExitPortStatistics | --ExtraInfoStatistics | \
+            --HiddenServiceStatistics | --OverloadStatistics | \
+            --PaddingStatistics | --DirCache | \
+            --HiddenServiceEnableIntroDoSDefense | \
+            --AuthoritativeDirectory | --BridgeAuthoritativeDir | \
+            --V3AuthoritativeDirectory | --AuthDirHasIPv6Connectivity | \
+            --AuthDirListBadExits | --AuthDirListMiddleOnly | \
+            --AuthDirPinKeys | --AuthDirRejectRequestsUnderLoad | \
+            --AuthDirSharedRandomness | --AuthDirTestEd25519LinkKeys | \
+            --AuthDirTestReachability | --DirAllowPrivateAddresses | \
+            --V3AuthUseLegacyKey | --VersioningAuthoritativeDirectory | \
+            --HiddenServiceAllowUnknownPorts | \
+            --HiddenServiceDirGroupReadable | \
+            --HiddenServiceOnionBalanceInstance | \
+            --HiddenServiceMaxStreamsCloseCircuit | \
+            --HiddenServiceSingleHopMode | \
+            --HiddenServiceNonAnonymousMode | \
+            --PublishHidServDescriptors | \
+            --TestingTorNetwork | \
+            --TestingDirAuthVoteExitIsStrict | \
+            --TestingDirAuthVoteGuardIsStrict | \
+            --TestingDirAuthVoteHSDirIsStrict | \
+            --TestingEnableCellStatsEvent | \
+            --TestingEnableConnBwEvent )
+            COMPREPLY=($(compgen -W "0 1" -- "$cur"))
+            return
+            ;;
+        --CacheDirectoryGroupReadable | --ExtendByEd25519ID | \
+            --KeepBindCapabilities | --ClientPreferIPv6DirPort | \
+            --ClientPreferIPv6ORPort | --ConnectionPadding | \
+            --UseGuardFraction | --VanguardsLiteEnabled | \
+            --UseMicroDescriptors | --GeoIPExcludeUnknown | \
+            --AssumeReachableIPv6 | --ExitRelay | \
+            --KeyDirectoryGroupReadable | --RefuseUnknownExits | \
+            --DoSCircuitCreationEnabled | --DoSConnectionEnabled | \
+            --DoSRefuseSingleHopClientRendezvous )
+            COMPREPLY=($(compgen -W "0 1 auto" -- "$cur"))
+            return
+            ;;
+        --SafeLogging )
+            COMPREPLY=($(compgen -W "0 1 relay" -- "$cur"))
+            return
+            ;;
+        --TransProxyType )
+            COMPREPLY=($(compgen -W "default TPROXY ipfw pf-divert" -- "$cur"))
+            return
+            ;;
+        --AccountingRule )
+            COMPREPLY=($(compgen -W "sum max in out" -- "$cur"))
+            return
+            ;;
+        --PublishServerDescriptor )
+            COMPREPLY=($(compgen -W "0 1 v3 bridge" -- "$cur"))
+            return
+            ;;
+        --HiddenServiceExportCircuitID )
+            COMPREPLY=($(compgen -W "haproxy" -- "$cur"))
+            return
+            ;;
+        --HiddenServiceVersion )
+            COMPREPLY=($(compgen -W "3" -- "$cur"))
+            return
+            ;;
+    esac
+
+    if [[ $cur == -* ]]; then
+        _comp_xfunc_tor_torrcopt
+        COMPREPLY=($(compgen -W "--help --torrc-file --allow-missing-torrc
+            --defaults-torrc --ignore-missing-torrc --hash-password
+            --list-fingerprint --verify-config --dump-config
+            --list-torrc-options --list-deprecated-options --list-modules
+            --version --quiet --hush --keygen --newpass --passphrase-fd
+            --key-expiration --format ${_tor_torrc_opt}" -- "$cur"))
+        return
+    fi
+
+} &&
+    complete -F _tor tor
+
+# ex: filetype=sh
